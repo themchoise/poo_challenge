@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./markerian-coscarelli-mele-santiago-joyce/app"
+    ]
+}
