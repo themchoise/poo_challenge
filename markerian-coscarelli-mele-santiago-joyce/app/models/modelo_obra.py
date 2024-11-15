@@ -18,4 +18,4 @@ class GestionObraModel(BaseModel):
     def __str__(self):
         pass
     class Meta:
-        db_table = 'GestionObra'
+        db_table = 'gestion_obra'
