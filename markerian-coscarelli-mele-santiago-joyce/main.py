@@ -1,5 +1,4 @@
 
-from app import modelo_orm
 from app.gestionar_obra_imp import GestionarObraEspecifica
 import logging
 logger = logging.getLogger('peewee')

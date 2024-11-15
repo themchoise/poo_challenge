@@ -12,7 +12,7 @@ class GestionObraModel(BaseModel):
     area_responsable = ForeignKeyField(AreaResponsable, backref='area_responsable')
     descripcion = TextField()
     monto_contrato = FloatField()  # Suponiendo que es un monto numérico
-    comuna = TextField()
+    comuna = TextField(null=True)
     barrio = ForeignKeyField(Barrio, backref='barrio')
     direccion = TextField()
     lat = FloatField()

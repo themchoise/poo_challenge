@@ -2,7 +2,7 @@
 import pandas as pd
 from app.gestionar_obra import GestionarObra
 from peewee import *
-from app.models.modelo_obra import GestionObraModel
+from app.modelo_obra import GestionObraModel
 from app.models import Entorno, Etapa, Tipo, AreaResponsable, Barrio,Licitacion_oferta_empresa, ContratacionTipo
 from app.db.database import db
 
@@ -97,25 +97,6 @@ class GestionarObraEspecifica(GestionarObra):
 
       
 
-
-      entorno_obj = Entorno.get(Entorno.id == 1)  
-      etapa_obj = Etapa.get(Etapa.id == 1)        
-      tipo_obj = Tipo.get(Tipo.id == 1)          
-      area_responsable_obj = AreaResponsable.get(AreaResponsable.id == 1) 
-
-      gestion_obra = GestionObraModel.create(
-      entorno=entorno_obj,
-      nombre="Nombre de la Obra",
-      etapa=etapa_obj,
-      tipo=tipo_obj,
-      area_responsable=area_responsable_obj,
-      descripcion="Descripción de la obra",
-      monto_contrato="1000000",    
-      date="2024-11-14 12:00:00",  
-      parcial=True,
-      quantity=10
-)
-      
       
        
 
