@@ -123,6 +123,7 @@ f. Cantidad de obras finalizadas y su y monto total de inversión en la comuna 1
 h. Porcentaje total de obras finalizadas. 
 i. Cantidad total de mano de obra empleada. 
 j. Monto total de inversión. 
+
 Aclaraciones: 
 1. En la clase abstracta “GestionarObra”, todos sus métodos deben ser métodos de clase y sus  atributos (en caso que considere que deba existir alguno) también serán atributos de clase. 2. Incluir código Python para manejar posibles excepciones donde considere conveniente para atrapar aquellas que puedan llegar a generarse. 
 Qué es la librería o módulo “Pandas”? 

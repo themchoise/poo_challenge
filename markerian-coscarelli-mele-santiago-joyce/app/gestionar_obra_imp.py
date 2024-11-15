@@ -3,7 +3,7 @@ import pandas as pd
 from app.gestionar_obra import GestionarObra
 from peewee import *
 from app.models.modelo_obra import GestionObraModel
-from app.models import Entorno, Etapa, Tipo, AreaResponsable
+from app.models import Entorno, Etapa, Tipo, AreaResponsable, Barrio,Licitacion_oferta_empresa, ContratacionTipo
 from app.db.database import db
 
 class GestionarObraEspecifica(GestionarObra):
@@ -56,7 +56,7 @@ class GestionarObraEspecifica(GestionarObra):
      
    def mapear_orm(self):
       print('Inicio de Mapeo al ORM')
-      self._db.create_tables([ Entorno, Etapa, Tipo, AreaResponsable, GestionObraModel], safe=True)
+      self._db.create_tables([ Entorno, Etapa, Tipo, AreaResponsable,Barrio, Licitacion_oferta_empresa, GestionObraModel, ContratacionTipo], safe=True)
       print('Fin del Mapeo al  ORM')
    
    def limpiar_datos(self):
@@ -82,6 +82,21 @@ class GestionarObraEspecifica(GestionarObra):
       tipo_unicos = list(self._df['tipo'].dropna().unique())
       tipo_unicos_list = [Tipo(tipo=tipo_unicos[i]) for i in range(len(tipo_unicos))]
       Tipo.bulk_create(tipo_unicos_list)
+
+      barrio = list(self._df['barrio'].dropna().unique())
+      barrio_list = [Barrio(barrio=barrio[i]) for i in range(len(barrio))]
+      Barrio.bulk_create(barrio_list)
+
+      licitacion_oferta_empresa = list(self._df['licitacion_oferta_empresa'].dropna().unique())
+      licitacion_oferta_empresa_list = [Licitacion_oferta_empresa(licitacion_oferta_empresa=licitacion_oferta_empresa[i]) for i in range(len(licitacion_oferta_empresa))]
+      Licitacion_oferta_empresa.bulk_create(licitacion_oferta_empresa_list)
+
+      contratacion_tipo = list(self._df['contratacion_tipo'].dropna().unique())
+      contratacion_tipo_list = [ContratacionTipo(contratacion_tipo=contratacion_tipo[i]) for i in range(len(contratacion_tipo))]
+      ContratacionTipo.bulk_create(contratacion_tipo_list)
+
+      
+
 
       entorno_obj = Entorno.get(Entorno.id == 1)  
       etapa_obj = Etapa.get(Etapa.id == 1)        
