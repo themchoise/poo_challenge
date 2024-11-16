@@ -1,17 +1,32 @@
+import os
 from peewee import SqliteDatabase
 from sqlite3 import OperationalError
 
-# Inicializa y configura la base de datos con modo WAL
+
+db_path = './observatorio_de_obras_urbanas.db'
+
+
+if os.path.exists(db_path):
+    try:
+        print(f"El archivo de la base de datos '{db_path}' ya existe. Eliminándolo...")
+        os.remove(db_path)
+        print("Base de datos eliminada exitosamente.")
+    except OSError as e:
+        print(f"Error al intentar eliminar la base de datos: {e}")
+        exit()
+
+
 try:
     print('Intentando conectar a la base de datos ->')
-    db = SqliteDatabase('./observatorio_de_obras_urbanas.db', pragmas={'journal_mode': 'wal'})
-    db.connect()  # Asegurarse de que esté conectada inmediatamente
+    db = SqliteDatabase(db_path, pragmas={'journal_mode': 'wal'})
+    db.connect()  
     print('Base de datos conectada exitosamente')
 except OperationalError as e:
     print("Error al conectar a la base de datos:", e)
     exit()
 
-# Definir un método de cierre seguro
+
 def cerrar_conexion():
     if not db.is_closed():
         db.close()
+        print("Conexión a la base de datos cerrada.")

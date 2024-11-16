@@ -5,15 +5,15 @@ from app.models import Entorno, Etapa, Tipo, AreaResponsable, Barrio
 
 # MAPEO DEL CSV A LA TABLA
 class GestionObraModel(BaseModel):
-    entorno = ForeignKeyField(Entorno, backref='entorno')
+    entorno = ForeignKeyField(Entorno, backref='entornos')
     nombre = TextField()
-    etapa = ForeignKeyField(Etapa, backref='etapa')
-    tipo = ForeignKeyField(Tipo, backref='tipo')
-    area_responsable = ForeignKeyField(AreaResponsable, backref='area_responsable')
+    etapa = ForeignKeyField(Etapa, backref='etapas')
+    tipo = ForeignKeyField(Tipo, backref='tipos')
+    area_responsable = ForeignKeyField(AreaResponsable, backref='areas_responsables')
     descripcion = TextField()
     monto_contrato = FloatField()  # Suponiendo que es un monto numérico
     comuna = TextField(null=True)
-    barrio = ForeignKeyField(Barrio, backref='barrio')
+    barrio = ForeignKeyField(Barrio, backref='barrios')
     direccion = TextField()
     lat = FloatField()
     lng = FloatField()

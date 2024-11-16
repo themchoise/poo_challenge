@@ -1,10 +1,13 @@
 
+import datetime
 import pandas as pd
 from app.gestionar_obra import GestionarObra
 from peewee import *
+from peewee import fn
 from app.modelo_obra import GestionObraModel
 from app.models import Entorno, Etapa, Tipo, AreaResponsable, Barrio,Licitacion_oferta_empresa, ContratacionTipo
 from app.db.database import db
+from app.helpers import buscar_registro
 
 class GestionarObraEspecifica(GestionarObra):
 
@@ -95,8 +98,64 @@ class GestionarObraEspecifica(GestionarObra):
       contratacion_tipo_list = [ContratacionTipo(contratacion_tipo=contratacion_tipo[i]) for i in range(len(contratacion_tipo))]
       ContratacionTipo.bulk_create(contratacion_tipo_list)
 
-      
+   def nueva_obra(self):
+     
+      print("Ingreso de nueva obra")
+      print("Por favor, ingresa los siguientes datos:")
+      entorno_nombre = input("Entorno: ")
+      etapa_nombre = input("Etapa: ")
+      tipo_nombre = input("Tipo: ")
+      area_nombre = input("Área Responsable: ")
+      barrio_nombre = input("Barrio: ")
 
+      
+      entorno = buscar_registro(entorno_nombre, Entorno, 'entorno')
+      etapa = buscar_registro(etapa_nombre, Etapa, 'etapa_nombre')
+      tipo = buscar_registro(tipo_nombre, Tipo, 'tipo_nombre')
+      area = buscar_registro(area_nombre, AreaResponsable, 'area_nombre')
+      barrio = buscar_registro(barrio_nombre, Barrio, 'barrio_nombre')
+
+
+      datos = {
+        "entorno": entorno,
+        "nombre": input("Nombre de la obra: "),
+        "etapa": etapa,
+        "tipo": tipo,
+        "area_responsable": area,
+        "descripcion": input("Descripción: "),
+        "monto_contrato": float(input("Monto del contrato: ")),
+        "comuna": input("Comuna (opcional): "),
+        "barrio": barrio,
+        "direccion": input("Dirección: "),
+        "lat": float(input("Latitud: ")),
+        "lng": float(input("Longitud: ")),
+        "fecha_inicio": datetime.date.fromisoformat(input("Fecha de inicio (YYYY-MM-DD): ")),
+        "fecha_fin_inicial": datetime.date.fromisoformat(input("Fecha fin inicial (YYYY-MM-DD): ")),
+        "plazo_meses": int(input("Plazo en meses: ")),
+        "porcentaje_avance": float(input("Porcentaje de avance: ")),
+        "imagen_1": input("Imagen 1 (opcional): "),
+        "licitacion_oferta_empresa": input("Licitación oferta empresa: "),
+        "licitacion_anio": int(input("Licitación año: ")),
+        "contratacion_tipo": input("Tipo de contratación: "),
+        "nro_contratacion": input("Número de contratación: "),
+        "cuit_contratista": input("CUIT contratista: "),
+        "beneficiarios": int(input("Número de beneficiarios: ")),
+        "mano_obra": int(input("Mano de obra: ")),
+        "compromiso": input("Compromiso: "),
+        "destacada": bool(int(input("¿Es destacada? (1: Sí, 0: No): "))),
+        "ba_elige": bool(int(input("¿BA elige? (1: Sí, 0: No): "))),
+        "link_interno": input("Link interno (opcional): "),
+        "pliego_descarga": input("Pliego descarga (opcional): "),
+        "expediente_numero": input("Número de expediente: "),
+        "estudio_ambiental_descarga": input("Estudio ambiental descarga (opcional): "),
+        "financiamiento": input("Financiamiento: ")
+      }
+      
+      GestionObraModel.create(**datos)
+
+      return
+      
+      
       
        
 
