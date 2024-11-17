@@ -30,6 +30,10 @@ class GestionarObra(ABC):
     def nueva_obra(self):
         pass
 
+    @abstractmethod
+    def obtener_indicadores(self):
+        pass
+
     @classmethod
     def nueva_obra(self):
         pass

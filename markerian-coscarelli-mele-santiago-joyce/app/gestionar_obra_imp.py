@@ -104,10 +104,6 @@ class GestionarObraEspecifica(GestionarObra):
       print("Por favor, ingresa los siguientes datos:")
   
      
-     
-      
-      
-
       entorno_nombre = input("Entorno: ")
       entorno = buscar_registro.buscar_registro(entorno_nombre, Entorno, 'entorno')
 
@@ -159,15 +155,52 @@ class GestionarObraEspecifica(GestionarObra):
         "financiamiento": input("Financiamiento: ")
       }
       
-      nu = GestionObraModel(**datos)
+      nueva_obra = GestionObraModel(**datos)
       nueva_obra.save()
       
       
 
       return
 
-   def obtener_indicadores():
-      return   
+   def obtener_indicadores(self):
+      print("""a. Listado de todas las áreas responsables. 
+               b. Listado de todos los tipos de obra. 
+               c. Cantidad de obras que se encuentran en cada etapa. 
+               d. Cantidad de obras y monto total de inversión por tipo de obra. 
+               e. Listado de todos los barrios pertenecientes a las comunas 1, 2 y 3. 
+               f. Cantidad de obras finalizadas y su y monto total de inversión en la comuna 1. g. Cantidad de obras finalizadas en un plazo menor o igual a 24 meses.
+               h. Porcentaje total de obras finalizadas. 
+               i. Cantidad total de mano de obra empleada. 
+               j. Monto total de inversión. """)
+      print("Listado de todas las áreas responsables")
+      areas_responsables =  AreaResponsable.select()
+      areas_responsables_data = [{  **area_responsable.__data__} for area_responsable in areas_responsables ]
+      print(areas_responsables_data)
+      print("")
+
+      print("Listado de todos los tipos de obra. ")
+      tipo_obras =  Tipo.select()
+      tipo_obras_data = [{  **tipo_obra.__data__} for tipo_obra in tipo_obras ]
+      print(tipo_obras_data)
+      print("")
+
+      #Cantidad de obras que se encuentran en cada etapa.
+      print("Cantidad de obras que se encuentran en cada etapa.")
+      query = (GestionObraModel
+         .select(GestionObraModel.nombre, fn.COUNT(GestionObraModel.etapa).alias('total'))
+         .group_by(GestionObraModel.nombre)
+         .order_by(GestionObraModel.nombre))
+
+      for nombre, total in query.tuples():
+         print(nombre, total)
+
+      #Cantidad de obras y monto total de inversión por tipo de obra. 
+
+      print("")
+      #obras =  GestionObraModel.select()
+      #obras_data= [ { **obra.__data__}for obra in obras ]
+
+         
       
       
        

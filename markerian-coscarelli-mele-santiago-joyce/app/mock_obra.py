@@ -1,0 +1,117 @@
+from datetime import date
+from peewee import fn
+from app.modelo_obra import GestionObraModel
+
+def runMock() -> None:
+    print('Inicio de Mock')
+
+    datos_mock = [
+        {
+            "entorno": 1,
+            "nombre": "Construcción de Puente Nuevo",
+            "etapa": 2,
+            "tipo": 1,
+            "area_responsable": 3,
+            "descripcion": "Construcción de un puente vehicular sobre el río.",
+            "monto_contrato": 1500000.00,
+            "comuna": "Comuna 1",
+            "barrio": 4,
+            "direccion": "Av. Libertador 1200",
+            "lat": -34.603722,
+            "lng": -58.381592,
+            "fecha_inicio": date(2024, 1, 15),
+            "fecha_fin_inicial": date(2024, 12, 20),
+            "plazo_meses": 12,
+            "porcentaje_avance": 40.0,
+            "imagen_1": "puente1.jpg",
+            "licitacion_oferta_empresa": "Construcciones SA",
+            "licitacion_anio": 2024,
+            "contratacion_tipo": "Licitación Pública",
+            "nro_contratacion": "1234",
+            "cuit_contratista": "30-12345678-9",
+            "beneficiarios": 50000,
+            "mano_obra": 200,
+            "compromiso": "Calidad y seguridad",
+            "destacada": True,
+            "ba_elige": False,
+            "link_interno": "http://example.com/puente",
+            "pliego_descarga": "pliego1.pdf",
+            "expediente_numero": "EXP123456",
+            "estudio_ambiental_descarga": "estudio1.pdf",
+            "financiamiento": "Gobierno de la Ciudad"
+        },
+        {
+            "entorno": 2,
+            "nombre": "Reparación de Red de Agua",
+            "etapa": 3,
+            "tipo": 2,
+            "area_responsable": 1,
+            "descripcion": "Reparación de cañerías en zona céntrica.",
+            "monto_contrato": 850000.00,
+            "comuna": "Comuna 3",
+            "barrio": 5,
+            "direccion": "Calle Corrientes 200",
+            "lat": -34.609722,
+            "lng": -58.382592,
+            "fecha_inicio": date(2024, 2, 10),
+            "fecha_fin_inicial": date(2024, 7, 15),
+            "plazo_meses": 5,
+            "porcentaje_avance": 70.0,
+            "imagen_1": None,
+            "licitacion_oferta_empresa": "Servicios Sanitarios SA",
+            "licitacion_anio": 2023,
+            "contratacion_tipo": "Contratación Directa",
+            "nro_contratacion": "5678",
+            "cuit_contratista": "30-98765432-1",
+            "beneficiarios": 30000,
+            "mano_obra": 50,
+            "compromiso": "Acceso continuo al agua",
+            "destacada": False,
+            "ba_elige": True,
+            "link_interno": None,
+            "pliego_descarga": "pliego2.pdf",
+            "expediente_numero": "EXP654321",
+            "estudio_ambiental_descarga": None,
+            "financiamiento": "Ministerio de Obras"
+        },
+        {
+            "entorno": 3,
+            "nombre": "Ampliación del Hospital Central",
+            "etapa": 4,
+            "tipo": 3,
+            "area_responsable": 2,
+            "descripcion": "Ampliación de salas y quirófanos del hospital.",
+            "monto_contrato": 2200000.00,
+            "comuna": "Comuna 5",
+            "barrio": 6,
+            "direccion": "Calle Salta 350",
+            "lat": -34.614722,
+            "lng": -58.385592,
+            "fecha_inicio": date(2023, 11, 20),
+            "fecha_fin_inicial": date(2024, 11, 20),
+            "plazo_meses": 12,
+            "porcentaje_avance": 20.0,
+            "imagen_1": "hospital1.jpg",
+            "licitacion_oferta_empresa": "Salud SA",
+            "licitacion_anio": 2023,
+            "contratacion_tipo": "Licitación Pública",
+            "nro_contratacion": "91011",
+            "cuit_contratista": "30-56789012-3",
+            "beneficiarios": 100000,
+            "mano_obra": 150,
+            "compromiso": "Salud pública de calidad",
+            "destacada": True,
+            "ba_elige": True,
+            "link_interno": "http://example.com/hospital",
+            "pliego_descarga": "pliego3.pdf",
+            "expediente_numero": "EXP789012",
+            "estudio_ambiental_descarga": "estudio2.pdf",
+            "financiamiento": "Presupuesto Nacional"
+        }
+    
+    ]
+
+    for datos in datos_mock:
+        nueva_obra = GestionObraModel.create(**datos)
+        print(f"Se ha creado la obra: {nueva_obra.nombre}")
+    return ('Fin del Mock')

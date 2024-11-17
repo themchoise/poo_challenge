@@ -1,5 +1,6 @@
 
 from app.gestionar_obra_imp import GestionarObraEspecifica
+from app.mock_obra import runMock
 import logging
 #logger = logging.getLogger('peewee')
 #logger.addHandler(logging.StreamHandler())
@@ -8,11 +9,15 @@ import logging
 data_filepath = "markerian-coscarelli-mele-santiago-joyce/data/observatorio-de-obras-urbanas.csv"
 
 
-nueva_obra = GestionarObraEspecifica(None, None)
-conexion_db = nueva_obra.conectar_db()
-nueva_obra.mapear_orm()
-nueva_obra.extraer_datos(data_filepath)
-nueva_obra.limpiar_datos()
-nueva_obra.cargar_datos()   
-nueva_obra.nueva_obra()
+gestionObra = GestionarObraEspecifica(None, None)
+conexion_db = gestionObra.conectar_db()
+gestionObra.mapear_orm()
+gestionObra.extraer_datos(data_filepath)
+gestionObra.limpiar_datos()
+gestionObra.cargar_datos()   
+#gestionObra.nueva_obra()
+runMock()
+obras = gestionObra.obtener_indicadores()   
+print(obras)
+
 
