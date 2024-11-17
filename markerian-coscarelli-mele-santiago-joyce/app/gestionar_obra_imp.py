@@ -102,18 +102,26 @@ class GestionarObraEspecifica(GestionarObra):
      
       print("Ingreso de nueva obra")
       print("Por favor, ingresa los siguientes datos:")
-      entorno_nombre = input("Entorno: ")
-      etapa_nombre = input("Etapa: ")
-      tipo_nombre = input("Tipo: ")
-      area_nombre = input("Área Responsable: ")
-      barrio_nombre = input("Barrio: ")
-
+  
+     
+     
       
-      entorno = buscar_registro(entorno_nombre, Entorno, 'entorno')
-      etapa = buscar_registro(etapa_nombre, Etapa, 'etapa_nombre')
-      tipo = buscar_registro(tipo_nombre, Tipo, 'tipo_nombre')
-      area = buscar_registro(area_nombre, AreaResponsable, 'area_nombre')
-      barrio = buscar_registro(barrio_nombre, Barrio, 'barrio_nombre')
+      
+
+      entorno_nombre = input("Entorno: ")
+      entorno = buscar_registro.buscar_registro(entorno_nombre, Entorno, 'entorno')
+
+      etapa_nombre = input("Etapa: ")
+      etapa = buscar_registro.buscar_registro(etapa_nombre, Etapa, 'etapa')
+
+      tipo_nombre = input("Tipo: ")
+      tipo = buscar_registro.buscar_registro(tipo_nombre, Tipo, 'tipo')
+
+      area_nombre = input("Área Responsable: ")
+      area = buscar_registro.buscar_registro(area_nombre, AreaResponsable, 'area_responsable')
+
+      barrio_nombre = input("Barrio: ")
+      barrio = buscar_registro.buscar_registro(barrio_nombre, Barrio, 'barrio')
 
 
       datos = {
@@ -151,10 +159,15 @@ class GestionarObraEspecifica(GestionarObra):
         "financiamiento": input("Financiamiento: ")
       }
       
-      GestionObraModel.create(**datos)
+      nu = GestionObraModel(**datos)
+      nueva_obra.save()
+      
+      
 
       return
-      
+
+   def obtener_indicadores():
+      return   
       
       
        
