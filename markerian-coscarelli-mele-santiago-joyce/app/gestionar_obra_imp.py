@@ -168,7 +168,8 @@ class GestionarObraEspecifica(GestionarObra):
                c. Cantidad de obras que se encuentran en cada etapa. 
                d. Cantidad de obras y monto total de inversión por tipo de obra. 
                e. Listado de todos los barrios pertenecientes a las comunas 1, 2 y 3. 
-               f. Cantidad de obras finalizadas y su y monto total de inversión en la comuna 1. g. Cantidad de obras finalizadas en un plazo menor o igual a 24 meses.
+               f. Cantidad de obras finalizadas y su y monto total de inversión en la comuna 1. 
+               g. Cantidad de obras finalizadas en un plazo menor o igual a 24 meses.
                h. Porcentaje total de obras finalizadas. 
                i. Cantidad total de mano de obra empleada. 
                j. Monto total de inversión. """)
@@ -194,17 +195,102 @@ class GestionarObraEspecifica(GestionarObra):
       for nombre, total in query.tuples():
          print(nombre, total)
 
+      print("")
       #Cantidad de obras y monto total de inversión por tipo de obra. 
+      query_cantidad_obras = (GestionObraModel
+         .select(fn.COUNT('*')))
+      cantidad_obras = query_cantidad_obras.scalar()
+      print(f'Total de obras -> {cantidad_obras}')
 
       print("")
+
+      query_inversion = (GestionObraModel
+         .select(Tipo.tipo, fn.SUM(GestionObraModel.monto_contrato).alias('total_monto_contrato'))
+         .join(Tipo, on=(GestionObraModel.tipo == Tipo.id))
+         .group_by(GestionObraModel.tipo)
+         .order_by(GestionObraModel.tipo))
+      
+      print(" monto total de inversión por tipo de obra")
+      for tipo, total_monto_contrato in query_inversion.tuples():
+         print(tipo, total_monto_contrato)
       #obras =  GestionObraModel.select()
       #obras_data= [ { **obra.__data__}for obra in obras ]
 
-         
+      print("")
+      #Listado de todos los barrios pertenecientes a las comunas 1, 2 y 3. 
+      comunas_ids = [1, 2, 3]
+      query_barrios = (GestionObraModel
+         .select(Barrio.barrio)
+         .join(Barrio, on=(GestionObraModel.barrio == Barrio.id))
+         .where(GestionObraModel.comuna << comunas_ids)
+         .order_by(GestionObraModel.barrio))   
+      print("Barrios de comunas 1 2 y 3")
+      for barrio in query_barrios.tuples():
+         print(barrio)      
       
-      
-       
+      #Cantidad de obras finalizadas y su y monto total de inversión en la comuna 1. 
+      print("")
+      print("Cantidad de obras finalizadas y su y monto total de inversión en la comuna 1.") 
+      comuna_busqueda = 1
+      comuna_busqueda = 1
+      query_inversion_comuna_uno = (
+         GestionObraModel
+         .select(
+            fn.COUNT(GestionObraModel.id).alias('cantidad_finalizad'), 
+            fn.SUM(GestionObraModel.monto_contrato).alias('monto_total')   )
+         .where(  (GestionObraModel.comuna == comuna_busqueda) &  (GestionObraModel.etapa == 1) )   )
 
+      for cantidad_finalizad, monto_total in query_inversion_comuna_uno.tuples():
+         print(f'Cantidad finalizad -> {cantidad_finalizad}, monto total -> {monto_total}')         
+
+
+      print("") 
+       # Cantidad de obras finalizadas en un plazo menor o igual a 24 meses.
+      querty_obras_finalizadas_plazo = (
+         GestionObraModel
+         .select( fn.COUNT(GestionObraModel.id).alias('cantidad_finalizad'))
+         .where(  GestionObraModel.plazo_meses <= '24'     ) )
+      
+      print("Cantidad de obras finalizadas en un plazo menor o igual a 24 meses. -> " + str(querty_obras_finalizadas_plazo.scalar()))
+
+
+      #Total Obras
+      #h. Porcentaje total de obras finalizadas. 
+      query_total_obras = (
+         GestionObraModel
+         .select(fn.COUNT(GestionObraModel.id).alias('total_obras'))
+      )
+      total_obras = query_total_obras.scalar()
+
+
+      querty_porcentaje_finalizadas = (
+         GestionObraModel
+         .select( fn.COUNT(GestionObraModel.id).alias('porcentaje_finalizad'))
+         .where(  GestionObraModel.etapa == 1   ) )
+      total_obras_finalizadas = querty_porcentaje_finalizadas.scalar()
+      porcentaje_finalizadas =  round(( total_obras_finalizadas / total_obras  )*100,2)
+      
+      print(f'Porcentaje total de obras finalizadas. -> {porcentaje_finalizadas}% ')
+      print("")
+
+      #Cantidad total de mano de obra empleada. 
+      query_total_mano_de_obra = (
+         GestionObraModel
+         .select(fn.SUM(GestionObraModel.mano_obra).alias('total_mano_obra'))
+      )
+      total_mano_de_obra = query_total_mano_de_obra.scalar()
+      print(f'total_mano_de_obra -> {total_mano_de_obra}')
+
+
+      #Monto total de inversion 
+      query_total_inversion = (
+         GestionObraModel
+         .select(fn.SUM(GestionObraModel.monto_contrato).alias('total_inversion'))
+      )
+      total_inversion = query_total_inversion.scalar()
+      print(f'total_inversion -> {total_inversion}')
+      
+         
      
 
      

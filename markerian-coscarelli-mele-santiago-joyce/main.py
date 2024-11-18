@@ -18,6 +18,6 @@ gestionObra.cargar_datos()
 #gestionObra.nueva_obra()
 runMock()
 obras = gestionObra.obtener_indicadores()   
-print(obras)
+
 
 

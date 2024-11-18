@@ -119,7 +119,8 @@ b. Listado de todos los tipos de obra.
 c. Cantidad de obras que se encuentran en cada etapa. 
 d. Cantidad de obras y monto total de inversión por tipo de obra. 
 e. Listado de todos los barrios pertenecientes a las comunas 1, 2 y 3. 
-f. Cantidad de obras finalizadas y su y monto total de inversión en la comuna 1. g. Cantidad de obras finalizadas en un plazo menor o igual a 24 meses.
+f. Cantidad de obras finalizadas y su y monto total de inversión en la comuna 1. 
+g. Cantidad de obras finalizadas en un plazo menor o igual a 24 meses.
 h. Porcentaje total de obras finalizadas. 
 i. Cantidad total de mano de obra empleada. 
 j. Monto total de inversión. 

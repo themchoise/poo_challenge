@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-
+from models.obra import Obra
 
 
 class GestionarObra(ABC):
@@ -36,5 +36,5 @@ class GestionarObra(ABC):
 
     @classmethod
     def nueva_obra(self):
-        pass
+        return Obra()
 
