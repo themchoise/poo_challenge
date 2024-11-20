@@ -1,39 +1,33 @@
 from datetime import datetime
 import peewee
+from app.models import Etapa, ContratacionTipo, Licitacion_oferta_empresa, Financiamiento
 from peewee import *
+from app.helpers.buscar_registro import buscar_registro
+from app.modelo_obra import GestionObraModel
 
-# Clase ORM para representar una obra
 class Obra:
     
-    def __init__(self, obra_instance):
-        self.obra = obra_instance  # La instancia de la obra de la base de datos
+    def __init__(self, obra_instance:GestionObraModel):
+        self.obra = obra_instance  # 
 
     def nuevo_proyecto(self):
         """Inicia un nuevo proyecto de obra"""
         try:
-            # etapa_proyecto instancia del objeto de la db que se obtuvo si existia, o que se creo si no.
-            # created = boolean true si fue creado en la db o false si el objeto ya existia en la db
-            # Etapa clase de Peewee que representa la tabla etapa en la db
-            # Obtener la etapa "Proyecto", si no existe, crearla en la tabla Etapa
-            # nombre="Proyecto" filtro de campo
-            etapa_proyecto, created = Etapa.get_or_create(nombre="Proyecto")
-            
-            # Asignar la etapa a la obra
-            self.obra.etapa = etapa_proyecto
+            etapa_proyecto, creado = Etapa.get_or_create(etapa="Proyecto")
+            self.obra.etapa = etapa_proyecto.id  # Acceder al objeto directamente
             self.obra.save()
-            # Actualiza el campo etapa en la db para reflejar que la obra está en la fase de proyecto.
+        
             print(f"Obra '{self.obra.nombre}' iniciada como Proyecto.")
         except Exception as e:
             print(f"Error al iniciar el proyecto: {e}")
 
     def iniciar_contratacion(self):
-        """Inicia la contratación de la obra"""
         try:
-            tipo_contratacion = input("Ingrese el tipo de contratación: ")
-            tipo_contratacion_instance = TipoContratacion.get(TipoContratacion.nombre == tipo_contratacion)
+            contratacion_tipo_input = input("Ingrese el tipo de contratación, ejemplo (Contratación Directa): ")
+            registro_db_tipo_contratacion = buscar_registro(contratacion_tipo_input, ContratacionTipo,'contratacion_tipo')
             
             nro_contratacion = input("Ingrese el número de contratación: ")
-            self.obra.tipo_contratacion = tipo_contratacion_instance
+            self.obra.contratacion_tipo = registro_db_tipo_contratacion
             self.obra.nro_contratacion = nro_contratacion
             self.obra.save()
             print(f"Contratación de la obra '{self.obra.nombre}' iniciada.")
@@ -45,14 +39,16 @@ class Obra:
     def adjudicar_obra(self):
         """Adjudica la obra a una empresa"""
         try:
-            empresa_nombre = input("Ingrese el nombre de la empresa: ")
-            empresa_instance = Empresa.get(Empresa.nombre == empresa_nombre)
-            
-            nro_expediente = input("Ingrese el número de expediente: ")
-            self.obra.empresa = empresa_instance
-            self.obra.nro_expediente = nro_expediente
+            empresa_nombre_input = input("Ingrese el nombre de la empresa: ")
+
+            registro_db_empresa = buscar_registro(empresa_nombre_input,Licitacion_oferta_empresa,'licitacion_oferta_empresa')
+            self.obra.licitacion_oferta_empresa = registro_db_empresa
+
+            expediente_numero_input = input("Ingrese el número de expediente: ")
+                        
+            self.obra.expediente_numero = expediente_numero_input
             self.obra.save()
-            print(f"Obra '{self.obra.nombre}' adjudicada a la empresa '{empresa_nombre}'.")
+            print("Adjudicacion Finalizada")
         except peewee.DoesNotExist:
             print("Error: La empresa no existe en la base de datos.")
         except Exception as e:
@@ -62,16 +58,15 @@ class Obra:
         """Inicia la obra asignando fecha de inicio y otros detalles"""
         try:
             self.obra.fecha_inicio = input("Ingrese la fecha de inicio de la obra (YYYY-MM-DD): ")
-            self.obra.fecha_inicio = datetime.strptime(self.obra.fecha_inicio, "%Y-%m-%d")
-
             self.obra.fecha_fin_inicial = input("Ingrese la fecha de finalización inicial (YYYY-MM-DD): ")
-            self.obra.fecha_fin_inicial = datetime.strptime(self.obra.fecha_fin_inicial, "%Y-%m-%d")
+            mano_obra = int(input("Ingrese la cantidad de mano de obra: "))            
+            fuente_financiamiento_input = input("Ingrese la fuente de financiamiento: ")
 
-            fuente_financiamiento = input("Ingrese la fuente de financiamiento: ")
-            fuente_financiamiento_instance = FuenteFinanciamiento.get(FuenteFinanciamiento.nombre == fuente_financiamiento)
+            registro_db_financiamiento = buscar_registro(fuente_financiamiento_input,Financiamiento,'financiamiento')
             
-            mano_obra = int(input("Ingrese la cantidad de mano de obra: "))
-            self.obra.fuente_financiamiento = fuente_financiamiento_instance
+            self.obra.fecha_fin_inicial = datetime.strptime(self.obra.fecha_fin_inicial, "%Y-%m-%d")
+            self.obra.fecha_inicio = datetime.strptime(self.obra.fecha_inicio, "%Y-%m-%d")
+            self.obra.financiamiento = registro_db_financiamiento
             self.obra.mano_obra = mano_obra
             self.obra.save()
             print(f"Obra '{self.obra.nombre}' iniciada con fecha de inicio {self.obra.fecha_inicio}.")
@@ -83,7 +78,6 @@ class Obra:
             print(f"Error al iniciar la obra: {e}")
     
     def actualizar_porcentaje_avance(self):
-        """Actualiza el porcentaje de avance de la obra"""
         try:
             nuevo_avance = float(input("Ingrese el porcentaje de avance (0-100): "))
             if 0 <= nuevo_avance <= 100:
@@ -98,10 +92,11 @@ class Obra:
             print(f"Error al actualizar el porcentaje de avance: {e}")
     
     def incrementar_plazo(self):
-        """Incrementa el plazo de la obra"""
+
         try:
             incremento_plazo = int(input("Ingrese el número de meses para incrementar el plazo: "))
-            self.obra.plazo_meses += incremento_plazo
+            plazo_meses_actual = 0 if self.obra.plazo_meses is None else self.obra.plazo_meses
+            self.obra.plazo_meses = plazo_meses_actual+ incremento_plazo
             self.obra.save()
             print(f"Plazo de la obra '{self.obra.nombre}' incrementado en {incremento_plazo} meses.")
         except ValueError:
@@ -124,7 +119,7 @@ class Obra:
     def finalizar_obra(self):
         """Finaliza la obra, estableciendo su etapa y porcentaje de avance"""
         try:
-            self.obra.etapa = Etapa.get(Etapa.nombre == "Finalizada")
+            self.obra.etapa = Etapa.get(Etapa.etapa == "Finalizada")
             self.obra.porcentaje_avance = 100
             self.obra.save()
             print(f"Obra '{self.obra.nombre}' finalizada con éxito.")
@@ -136,10 +131,10 @@ class Obra:
     def rescindir_obra(self):
         """Rescinde la obra, cambiando su etapa a 'Rescindida'"""
         try:
-            self.obra.etapa = Etapa.get(Etapa.nombre == "Rescindida")
+            self.obra.etapa = Etapa.get(Etapa.etapa == "Rescisión")
             self.obra.save()
             print(f"Obra '{self.obra.nombre}' rescindida.")
         except peewee.DoesNotExist:
-            print("Error: La etapa 'Rescindida' no existe en la base de datos.")
+            print("Error: La etapa 'Rescisión' no existe en la base de datos.")
         except Exception as e:
             print(f"Error al rescindir la obra: {e}")

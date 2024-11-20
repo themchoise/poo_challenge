@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from models.obra import Obra
+from .obra import Obra
 
 
 class GestionarObra(ABC):

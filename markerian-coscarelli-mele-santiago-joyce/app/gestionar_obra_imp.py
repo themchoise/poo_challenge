@@ -5,7 +5,7 @@ from app.gestionar_obra import GestionarObra
 from peewee import *
 from peewee import fn
 from app.modelo_obra import GestionObraModel
-from app.models import Entorno, Etapa, Tipo, AreaResponsable, Barrio,Licitacion_oferta_empresa, ContratacionTipo
+from app.models import Entorno, Etapa, Tipo, AreaResponsable, Barrio,Licitacion_oferta_empresa, ContratacionTipo,Financiamiento
 from app.db.database import db
 from app.helpers import buscar_registro
 
@@ -48,7 +48,7 @@ class GestionarObraEspecifica(GestionarObra):
 
 
 # A ESTE METODO SE LE PASA EL PATH DEL CSV Y DEVUELVE LOS DATOS EN FORMATO DATAFRAME
-   def extraer_datos(self, path):
+   def extraer_datos(self, path) -> GestionObraModel:
      try:
         df = pd.read_csv(path, sep=";", index_col=None, encoding='latin-1')
         print('Datos Extraidos')
@@ -59,7 +59,7 @@ class GestionarObraEspecifica(GestionarObra):
      
    def mapear_orm(self):
       print('Inicio de Mapeo al ORM')
-      self._db.create_tables([ Entorno, Etapa, Tipo, AreaResponsable,Barrio, Licitacion_oferta_empresa, GestionObraModel, ContratacionTipo], safe=True)
+      self._db.create_tables([ Entorno, Etapa, Tipo, AreaResponsable,Barrio, Licitacion_oferta_empresa, GestionObraModel, ContratacionTipo, Financiamiento], safe=True)
       print('Fin del Mapeo al  ORM')
    
    def limpiar_datos(self):
@@ -69,10 +69,14 @@ class GestionarObraEspecifica(GestionarObra):
        print('Fin Limpeza')
 
    def cargar_datos(self):
-      print(self._db)
       area_responsable_unicos = list(self._df['area_responsable'].dropna().unique())
       area_responsable_list = [AreaResponsable(area_responsable=area_responsable_unicos[i]) for i in range(len(area_responsable_unicos))]
       AreaResponsable.bulk_create(area_responsable_list)
+
+      financiamiento_unicos = list(self._df['financiamiento'].dropna().unique())
+      financiamiento_unicos.insert(0,'No Definido')
+      financiamiento_list = [Financiamiento(financiamiento=financiamiento_unicos[i]) for i in range(len(financiamiento_unicos))]
+      Financiamiento.bulk_create(financiamiento_list)
 
       entorno_unicos = list(self._df['entorno'].dropna().unique())
       entorno_unicos_list = [Entorno(entorno=entorno_unicos[i]) for i in range(len(entorno_unicos))]
@@ -91,10 +95,12 @@ class GestionarObraEspecifica(GestionarObra):
       Barrio.bulk_create(barrio_list)
 
       licitacion_oferta_empresa = list(self._df['licitacion_oferta_empresa'].dropna().unique())
+      licitacion_oferta_empresa.insert(0,'No Definido')
       licitacion_oferta_empresa_list = [Licitacion_oferta_empresa(licitacion_oferta_empresa=licitacion_oferta_empresa[i]) for i in range(len(licitacion_oferta_empresa))]
       Licitacion_oferta_empresa.bulk_create(licitacion_oferta_empresa_list)
 
       contratacion_tipo = list(self._df['contratacion_tipo'].dropna().unique())
+      contratacion_tipo.insert(0,'No Definido')
       contratacion_tipo_list = [ContratacionTipo(contratacion_tipo=contratacion_tipo[i]) for i in range(len(contratacion_tipo))]
       ContratacionTipo.bulk_create(contratacion_tipo_list)
 
@@ -102,65 +108,61 @@ class GestionarObraEspecifica(GestionarObra):
      
       print("Ingreso de nueva obra")
       print("Por favor, ingresa los siguientes datos:")
-  
      
-      entorno_nombre = input("Entorno: ")
+      entorno_nombre = input("Entorno, ejemplo(Acumar, Paseo Del Bajo): ")
       entorno = buscar_registro.buscar_registro(entorno_nombre, Entorno, 'entorno')
 
-      etapa_nombre = input("Etapa: ")
-      etapa = buscar_registro.buscar_registro(etapa_nombre, Etapa, 'etapa')
 
-      tipo_nombre = input("Tipo: ")
+      tipo_nombre = input("Tipo, ejemplo(Vivienda, Escuelas): ")
       tipo = buscar_registro.buscar_registro(tipo_nombre, Tipo, 'tipo')
 
-      area_nombre = input("Área Responsable: ")
+      area_nombre = input("Área Responsable, ejemplo(Instituto de la Vivienda): ")
       area = buscar_registro.buscar_registro(area_nombre, AreaResponsable, 'area_responsable')
 
-      barrio_nombre = input("Barrio: ")
+      barrio_nombre = input("Barrio, ejemplo(Montserrat): ")
       barrio = buscar_registro.buscar_registro(barrio_nombre, Barrio, 'barrio')
 
-
+      # Los valores 0 hacen referencia al Dato no definido
+      # Etapa 5 significa "En Obra"
+     
       datos = {
         "entorno": entorno,
         "nombre": input("Nombre de la obra: "),
-        "etapa": etapa,
+        "etapa": 5,
         "tipo": tipo,
         "area_responsable": area,
-        "descripcion": input("Descripción: "),
-        "monto_contrato": float(input("Monto del contrato: ")),
-        "comuna": input("Comuna (opcional): "),
         "barrio": barrio,
         "direccion": input("Dirección: "),
-        "lat": float(input("Latitud: ")),
-        "lng": float(input("Longitud: ")),
-        "fecha_inicio": datetime.date.fromisoformat(input("Fecha de inicio (YYYY-MM-DD): ")),
-        "fecha_fin_inicial": datetime.date.fromisoformat(input("Fecha fin inicial (YYYY-MM-DD): ")),
-        "plazo_meses": int(input("Plazo en meses: ")),
-        "porcentaje_avance": float(input("Porcentaje de avance: ")),
-        "imagen_1": input("Imagen 1 (opcional): "),
-        "licitacion_oferta_empresa": input("Licitación oferta empresa: "),
-        "licitacion_anio": int(input("Licitación año: ")),
-        "contratacion_tipo": input("Tipo de contratación: "),
-        "nro_contratacion": input("Número de contratación: "),
-        "cuit_contratista": input("CUIT contratista: "),
-        "beneficiarios": int(input("Número de beneficiarios: ")),
-        "mano_obra": int(input("Mano de obra: ")),
-        "compromiso": input("Compromiso: "),
-        "destacada": bool(int(input("¿Es destacada? (1: Sí, 0: No): "))),
-        "ba_elige": bool(int(input("¿BA elige? (1: Sí, 0: No): "))),
-        "link_interno": input("Link interno (opcional): "),
-        "pliego_descarga": input("Pliego descarga (opcional): "),
-        "expediente_numero": input("Número de expediente: "),
-        "estudio_ambiental_descarga": input("Estudio ambiental descarga (opcional): "),
-        "financiamiento": input("Financiamiento: ")
+        "licitacion_oferta_empresa": 0,
+        "contratacion_tipo": 0,
+        "financiamiento": 0
       }
-      
       nueva_obra = GestionObraModel(**datos)
-      nueva_obra.save()
-      
-      
+      return nueva_obra.save()
+   
+   # Este metodo se usa para generar una obra ficticia
+   def nueva_obra_mock(self):
+      # Los valores 0 hacen referencia al Dato no definido
+      # Etapa 5 significa "En Obra"
+     
+      datos = {
+        "entorno": 1,
+        "nombre": "Obra Mock",
+        "etapa": 5,
+        "tipo": 1,
+        "area_responsable": 1,
+        "barrio": 1,
+        "direccion": "Fake Street 321",
+        "licitacion_oferta_empresa": 0,
+        "contratacion_tipo": 0,
+        "financiamiento": 0
+      }
+      nueva_obra_mock = GestionObraModel(**datos)
+      nueva_obra_mock.save()
+      return nueva_obra_mock
 
-      return
+
+   
 
    def obtener_indicadores(self):
       print("""a. Listado de todas las áreas responsables. 
