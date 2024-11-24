@@ -39,7 +39,7 @@ class Obra:
     def adjudicar_obra(self):
         """Adjudica la obra a una empresa"""
         try:
-            empresa_nombre_input = input("Ingrese el nombre de la empresa: ")
+            empresa_nombre_input = input("Ingrese el nombre de la empresa, ejemplo(SES SA): ")
 
             registro_db_empresa = buscar_registro(empresa_nombre_input,Licitacion_oferta_empresa,'licitacion_oferta_empresa')
             self.obra.licitacion_oferta_empresa = registro_db_empresa

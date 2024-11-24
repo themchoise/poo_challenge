@@ -1,8 +1,8 @@
-Walter
-Angelito
-Yo
-Eli
-Santiago
+Walter Markerian
+Angelito Coscarelli
+Maximiliano Joyce
+Elisa Mele
+Santiago Vanotti
 
 ---
 

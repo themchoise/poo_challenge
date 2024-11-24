@@ -159,10 +159,6 @@ class GestionarObraEspecifica(GestionarObra):
          except Exception as e:
             print(f"Error desconocido al guardar la obra '{datos_popular.get('nombre', 'Desconocido')}': {e}")
                   
-       
-         
-
-
    def nueva_obra(self):
      
       print("Ingreso de nueva obra")
@@ -196,31 +192,11 @@ class GestionarObraEspecifica(GestionarObra):
         "contratacion_tipo": 0,
         "financiamiento": 0
       }
-      nueva_obra = GestionObraModel(**datos)
-      return nueva_obra.save()
-   
-   # Este metodo se usa para generar una obra ficticia
-   def nueva_obra_mock(self):
-      # Los valores 0 hacen referencia al Dato no definido
-      # Etapa 5 significa "En Obra"
-     
-      datos = {
-        "entorno": 1,
-        "nombre": "Obra Mock",
-        "etapa": 5,
-        "tipo": 1,
-        "area_responsable": 1,
-        "barrio": 1,
-        "direccion": "Fake Street 321",
-        "licitacion_oferta_empresa": 0,
-        "contratacion_tipo": 0,
-        "financiamiento": 0
-      }
-      nueva_obra_mock = GestionObraModel(**datos)
-      nueva_obra_mock.save()
-      return nueva_obra_mock
-   
 
+      nueva_obra = GestionObraModel(**datos)
+      nueva_obra.save()
+      return nueva_obra
+   
    def obtener_indicadores(self):
       print("""a. Listado de todas las áreas responsables. 
                b. Listado de todos los tipos de obra. 
