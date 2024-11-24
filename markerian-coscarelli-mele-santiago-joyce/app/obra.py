@@ -14,7 +14,7 @@ class Obra:
         """Inicia un nuevo proyecto de obra"""
         try:
             etapa_proyecto, creado = Etapa.get_or_create(etapa="Proyecto")
-            self.obra.etapa = etapa_proyecto.id  # Acceder al objeto directamente
+            self.obra.etapa = etapa_proyecto.id  
             self.obra.save()
         
             print(f"Obra '{self.obra.nombre}' iniciada como Proyecto.")

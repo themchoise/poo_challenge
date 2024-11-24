@@ -63,12 +63,13 @@ class GestionarObraEspecifica(GestionarObra):
       print('Fin del Mapeo al  ORM')
    
    def limpiar_datos(self):
-       print('Inicio Limpieza')
+       print('Inicio Limpieza')      
        self._df.dropna(how='all', inplace=True)
-       self._df.fillna(value='', inplace=True)  
+       self._df.fillna(value='', inplace=True)
        print('Fin Limpeza')
 
    def cargar_datos(self):
+      print("Inicio de la carga de datos")
       area_responsable_unicos = list(self._df['area_responsable'].dropna().unique())
       area_responsable_list = [AreaResponsable(area_responsable=area_responsable_unicos[i]) for i in range(len(area_responsable_unicos))]
       AreaResponsable.bulk_create(area_responsable_list)
@@ -103,6 +104,64 @@ class GestionarObraEspecifica(GestionarObra):
       contratacion_tipo.insert(0,'No Definido')
       contratacion_tipo_list = [ContratacionTipo(contratacion_tipo=contratacion_tipo[i]) for i in range(len(contratacion_tipo))]
       ContratacionTipo.bulk_create(contratacion_tipo_list)
+
+      tamanio_dataset = self._df.shape[0]
+
+      print(f'Rows a Insertar segun dataset -> {tamanio_dataset} \n')
+      for index, row in self._df.iterrows():
+         porcentaje = (index + 1) / tamanio_dataset * 100
+         print(f"\033[FProgreso: {porcentaje:.2f}%")
+         datos_popular = {
+         "entorno": Entorno.select().where(Entorno.entorno == row['entorno']).limit(1).first(),
+         "nombre": row['nombre'],
+         "etapa": Etapa.select().where(Etapa.etapa == row['etapa']).limit(1).first(),
+         "tipo": Tipo.select().where(Tipo.tipo == row['tipo']).limit(1).first(),
+         "area_responsable": AreaResponsable.select().where(AreaResponsable.area_responsable == row['area_responsable']).limit(1).first(),
+         "descripcion": row['descripcion'],
+         "monto_contrato": row['monto_contrato'],
+         "comuna": row['comuna'],
+         "barrio": Barrio.select().where(Barrio.barrio == row['barrio']).limit(1).first(),
+         "direccion": row['direccion'],
+         "lat": row['lat'],
+         "lng": row['lng'],
+         "fecha_inicio": row['fecha_inicio'],
+         "fecha_fin_inicial": row['fecha_fin_inicial'],
+         "plazo_meses": row['plazo_meses'],
+         "porcentaje_avance": row['porcentaje_avance'],
+         "imagen_1": row['imagen_1'],
+         "imagen_2": row['imagen_2'],
+         "imagen_3": row['imagen_3'],
+         "imagen_4": row['imagen_4'],
+         "licitacion_oferta_empresa": row['licitacion_oferta_empresa'],
+         "licitacion_anio": row['licitacion_anio'],
+         "contratacion_tipo": row['contratacion_tipo'],
+         "nro_contratacion": row['nro_contratacion'],
+         "cuit_contratista": row['cuit_contratista'],
+         "beneficiarios": row['beneficiarios'],
+         "mano_obra": row['mano_obra'],
+         "compromiso": row['compromiso'],
+         "destacada": row['destacada'],
+         "ba_elige": row['ba_elige'],
+         "link_interno": row['link_interno'],
+         "pliego_descarga": row['pliego_descarga'],
+         "expediente_numero": row['expediente-numero'],
+         "estudio_ambiental_descarga": row['estudio_ambiental_descarga'],
+         "financiamiento": row['financiamiento'],
+         }
+
+         try:
+            obra_pulada = GestionObraModel(**datos_popular) 
+            obra_pulada.save()  
+         except IntegrityError as e:
+            print(f"Error de integridad al guardar la obra '{datos_popular.get('nombre', 'Desconocido')}': {e}")
+         except DatabaseError as e:
+            print(f"Error de base de datos al guardar la obra '{datos_popular.get('nombre', 'Desconocido')}': {e}")
+         except Exception as e:
+            print(f"Error desconocido al guardar la obra '{datos_popular.get('nombre', 'Desconocido')}': {e}")
+                  
+       
+         
+
 
    def nueva_obra(self):
      
@@ -160,8 +219,6 @@ class GestionarObraEspecifica(GestionarObra):
       nueva_obra_mock = GestionObraModel(**datos)
       nueva_obra_mock.save()
       return nueva_obra_mock
-
-
    
 
    def obtener_indicadores(self):

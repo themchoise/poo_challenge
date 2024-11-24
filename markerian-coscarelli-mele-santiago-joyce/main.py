@@ -29,6 +29,8 @@ gestionObra.limpiar_datos()
 #POPULACION DE LA DB CON LOS DATOS DEL DATASET
 gestionObra.cargar_datos()   
 
+"""
+
 # INGRESO DE LOS DATOS DE LA NUEVA OBRA, ESTO YA PERSISTE EN DB
 #nueva_obra_creada = gestionObra.nueva_obra()
 nueva_obra_creada = gestionObra.nueva_obra_mock()
@@ -49,3 +51,4 @@ nuevo_proyecto_obra.rescindir_obra()
 
 
 
+"""
