@@ -1,34 +1,43 @@
 
+import os
 import sys
 from app.gestionar_obra_imp import GestionarObraEspecifica
-from app.mock_obra import runMock
 from app.obra import Obra
+from app.db import crear_o_conectar_bd, cerrar_conexion
+from app.helpers import check_etl
 
 import logging
+
 #logger = logging.getLogger('peewee')
 #logger.addHandler(logging.StreamHandler())
 #logger.setLevel(logging.DEBUG)
 
+db_path = './observatorio_de_obras_urbanas.db'
+
 data_filepath = "markerian-coscarelli-mele-vanotti-joyce/data/observatorio-de-obras-urbanas.csv"
-#ETAPAS DEL SOFTWARE PRIMERO SE INICIA EL PROYECTO CON LA IMPLEMENTACION DE LA GESTION DE OBRA
-# LOS PARAMETROS NONE Y NONE SON A FUTURO LA DB Y Y EL DATASET YA PROCESADO POR PANDAS
+
+status_etl = check_etl.check_etk_status()
+# Verifica si el archivo existe antes de intentar abrirlo
+status_p =   ' Ya ejecutado' if status_etl else ' No ejecutado'
+
 gestionObra = GestionarObraEspecifica(None, None)
 
 #CONEXION A LA DB
 conexion_db = gestionObra.conectar_db()
 
-#CREACION DE TABLAS  Y ESTRUCTURA DE LA DB
-gestionObra.mapear_orm()
+if not status_etl:
+    
+    gestionObra.mapear_orm()
+    # EXTRACCION DE DATOS DEL DATASET PUBLICO
+    gestionObra.extraer_datos(data_filepath)
 
-# EXTRACCION DE DATOS DEL DATASET PUBLICO
-gestionObra.extraer_datos(data_filepath)
-
-# LIMPIEZA DE DATOS BASURA
-gestionObra.limpiar_datos()
-
-#POPULACION DE LA DB CON LOS DATOS DEL DATASET
-gestionObra.cargar_datos()   
-
+    # LIMPIEZA DE DATOS BASURA
+    gestionObra.limpiar_datos()
+    #POPULACION DE LA DB CON LOS DATOS DEL DATASET1
+    gestionObra.cargar_datos() 
+else:
+    print("Proceso ETL Omitido")
+  
 
 # Variable global para almacenar la obra creada
 obra_actual = None
@@ -49,7 +58,10 @@ def menu():
         print("7. Incrementar mano de obra")
         print("8. Finalizar obra")
         print("9. Rescindir obra")
-        print("10. Salir")
+        print("10. Reiniciar Proceso ETL")
+        print("11. Menu de Indicadores")
+        print("12. Salir")
+        
         opcion = input("Seleccione una opción: ")
 
         if opcion == '1':
@@ -106,8 +118,18 @@ def menu():
                 print("Obra rescindida con éxito.")
             else:
                 print("No hay una obra creada. Cree una obra primero.")
-        elif opcion == '10':
+        elif opcion == '11':
+            gestionObra.obtener_indicadores()             
+        elif opcion == '12':
+            
+            print("Reiniciando ETL...")
+            check_etl.reset_etl()
+            python = sys.executable
+            os.execl(python, python, *sys.argv)
+            sys.re()
+        elif opcion == '11':
             print("Saliendo del programa...")
+            cerrar_conexion(conexion_db)
             sys.exit()
         else:
             print("Opción inválida. Intente nuevamente.")

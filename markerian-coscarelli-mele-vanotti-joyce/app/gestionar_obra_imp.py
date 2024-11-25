@@ -1,5 +1,4 @@
 
-import datetime
 import pandas as pd
 from app.gestionar_obra import GestionarObra
 from peewee import *
@@ -8,6 +7,8 @@ from app.modelo_obra import GestionObraModel
 from app.models import Entorno, Etapa, Tipo, AreaResponsable, Barrio,Licitacion_oferta_empresa, ContratacionTipo,Financiamiento
 from app.db.database import db
 from app.helpers import buscar_registro
+from app.helpers import check_etl
+
 
 class GestionarObraEspecifica(GestionarObra):
 
@@ -34,11 +35,11 @@ class GestionarObraEspecifica(GestionarObra):
 
    def conectar_db(self):
       try:
-         # Verificar si la base de datos está cerrada y conectarla si es necesario
+        
          if db.is_closed():
-               db.connect()  # Conectar la base de datos si está cerrada
+               db.connect() 
 
-         # Asignar la conexión de base de datos al atributo `self._db`
+      
          self._db = db
          return db
 
@@ -158,7 +159,8 @@ class GestionarObraEspecifica(GestionarObra):
             print(f"Error de base de datos al guardar la obra '{datos_popular.get('nombre', 'Desconocido')}': {e}")
          except Exception as e:
             print(f"Error desconocido al guardar la obra '{datos_popular.get('nombre', 'Desconocido')}': {e}")
-                  
+
+      check_etl.set_etl()    
    def nueva_obra(self):
      
       print("Ingreso de nueva obra")
@@ -198,136 +200,114 @@ class GestionarObraEspecifica(GestionarObra):
       return nueva_obra
    
    def obtener_indicadores(self):
-      print("""a. Listado de todas las áreas responsables. 
-               b. Listado de todos los tipos de obra. 
-               c. Cantidad de obras que se encuentran en cada etapa. 
-               d. Cantidad de obras y monto total de inversión por tipo de obra. 
-               e. Listado de todos los barrios pertenecientes a las comunas 1, 2 y 3. 
-               f. Cantidad de obras finalizadas y su y monto total de inversión en la comuna 1. 
-               g. Cantidad de obras finalizadas en un plazo menor o igual a 24 meses.
-               h. Porcentaje total de obras finalizadas. 
-               i. Cantidad total de mano de obra empleada. 
-               j. Monto total de inversión. """)
-      print("Listado de todas las áreas responsables")
-      areas_responsables =  AreaResponsable.select()
-      areas_responsables_data = [{  **area_responsable.__data__} for area_responsable in areas_responsables ]
-      print(areas_responsables_data)
-      print("")
+      def mostrar_menu():
+         print("\n" + "=" * 50)
+         print("               GESTIÓN DE OBRAS")
+         print("=" * 50)
+         print("1. Listado de todas las áreas responsables")
+         print("2. Listado de todos los tipos de obra")
+         print("3. Cantidad de obras que se encuentran en cada etapa")
+         print("4. Cantidad de obras y monto total de inversión por tipo de obra")
+         print("5. Listado de todos los barrios en las comunas 1, 2 y 3")
+         print("6. Obras finalizadas y monto total de inversión en la comuna 1")
+         print("7. Cantidad de obras finalizadas en un plazo menor o igual a 24 meses")
+         print("8. Porcentaje total de obras finalizadas")
+         print("9. Cantidad total de mano de obra empleada")
+         print("10. Monto total de inversión")
+         print("0. Salir")
+         print("=" * 50)
 
-      print("Listado de todos los tipos de obra. ")
-      tipo_obras =  Tipo.select()
-      tipo_obras_data = [{  **tipo_obra.__data__} for tipo_obra in tipo_obras ]
-      print(tipo_obras_data)
-      print("")
-
-      #Cantidad de obras que se encuentran en cada etapa.
-      print("Cantidad de obras que se encuentran en cada etapa.")
-      query = (GestionObraModel
-         .select(GestionObraModel.nombre, fn.COUNT(GestionObraModel.etapa).alias('total'))
-         .group_by(GestionObraModel.nombre)
-         .order_by(GestionObraModel.nombre))
-
-      for nombre, total in query.tuples():
-         print(nombre, total)
-
-      print("")
-      #Cantidad de obras y monto total de inversión por tipo de obra. 
-      query_cantidad_obras = (GestionObraModel
-         .select(fn.COUNT('*')))
-      cantidad_obras = query_cantidad_obras.scalar()
-      print(f'Total de obras -> {cantidad_obras}')
-
-      print("")
-
-      query_inversion = (GestionObraModel
-         .select(Tipo.tipo, fn.SUM(GestionObraModel.monto_contrato).alias('total_monto_contrato'))
-         .join(Tipo, on=(GestionObraModel.tipo == Tipo.id))
-         .group_by(GestionObraModel.tipo)
-         .order_by(GestionObraModel.tipo))
-      
-      print(" monto total de inversión por tipo de obra")
-      for tipo, total_monto_contrato in query_inversion.tuples():
-         print(tipo, total_monto_contrato)
-      #obras =  GestionObraModel.select()
-      #obras_data= [ { **obra.__data__}for obra in obras ]
-
-      print("")
-      #Listado de todos los barrios pertenecientes a las comunas 1, 2 y 3. 
-      comunas_ids = [1, 2, 3]
-      query_barrios = (GestionObraModel
-         .select(Barrio.barrio)
-         .join(Barrio, on=(GestionObraModel.barrio == Barrio.id))
-         .where(GestionObraModel.comuna << comunas_ids)
-         .order_by(GestionObraModel.barrio))   
-      print("Barrios de comunas 1 2 y 3")
-      for barrio in query_barrios.tuples():
-         print(barrio)      
-      
-      #Cantidad de obras finalizadas y su y monto total de inversión en la comuna 1. 
-      print("")
-      print("Cantidad de obras finalizadas y su y monto total de inversión en la comuna 1.") 
-      comuna_busqueda = 1
-      comuna_busqueda = 1
-      query_inversion_comuna_uno = (
-         GestionObraModel
-         .select(
-            fn.COUNT(GestionObraModel.id).alias('cantidad_finalizad'), 
-            fn.SUM(GestionObraModel.monto_contrato).alias('monto_total')   )
-         .where(  (GestionObraModel.comuna == comuna_busqueda) &  (GestionObraModel.etapa == 1) )   )
-
-      for cantidad_finalizad, monto_total in query_inversion_comuna_uno.tuples():
-         print(f'Cantidad finalizad -> {cantidad_finalizad}, monto total -> {monto_total}')         
-
-
-      print("") 
-       # Cantidad de obras finalizadas en un plazo menor o igual a 24 meses.
-      querty_obras_finalizadas_plazo = (
-         GestionObraModel
-         .select( fn.COUNT(GestionObraModel.id).alias('cantidad_finalizad'))
-         .where(  GestionObraModel.plazo_meses <= '24'     ) )
-      
-      print("Cantidad de obras finalizadas en un plazo menor o igual a 24 meses. -> " + str(querty_obras_finalizadas_plazo.scalar()))
-
-
-      #Total Obras
-      #h. Porcentaje total de obras finalizadas. 
-      query_total_obras = (
-         GestionObraModel
-         .select(fn.COUNT(GestionObraModel.id).alias('total_obras'))
-      )
-      total_obras = query_total_obras.scalar()
-
-
-      querty_porcentaje_finalizadas = (
-         GestionObraModel
-         .select( fn.COUNT(GestionObraModel.id).alias('porcentaje_finalizad'))
-         .where(  GestionObraModel.etapa == 1   ) )
-      total_obras_finalizadas = querty_porcentaje_finalizadas.scalar()
-      porcentaje_finalizadas =  round(( total_obras_finalizadas / total_obras  )*100,2)
-      
-      print(f'Porcentaje total de obras finalizadas. -> {porcentaje_finalizadas}% ')
-      print("")
-
-      #Cantidad total de mano de obra empleada. 
-      query_total_mano_de_obra = (
-         GestionObraModel
-         .select(fn.SUM(GestionObraModel.mano_obra).alias('total_mano_obra'))
-      )
-      total_mano_de_obra = query_total_mano_de_obra.scalar()
-      print(f'total_mano_de_obra -> {total_mano_de_obra}')
-
-
-      #Monto total de inversion 
-      query_total_inversion = (
-         GestionObraModel
-         .select(fn.SUM(GestionObraModel.monto_contrato).alias('total_inversion'))
-      )
-      total_inversion = query_total_inversion.scalar()
-      print(f'total_inversion -> {total_inversion}')
-      
+      def ejecutar_opcion(opcion):
+         if opcion == 1:
+            print("\n--- Listado de todas las áreas responsables ---")
+            areas_responsables = AreaResponsable.select()
+            for area in areas_responsables:
+                  print(area.__data__)
          
-     
+         elif opcion == 2:
+            print("\n--- Listado de todos los tipos de obra ---")
+            tipos_obra = Tipo.select()
+            for tipo in tipos_obra:
+                  print(tipo.__data__)
+         
+         elif opcion == 3:
+            print("\n--- Cantidad de obras por etapa ---")
+            query = (GestionObraModel
+                     .select(GestionObraModel.nombre, fn.COUNT(GestionObraModel.etapa).alias('total'))
+                     .group_by(GestionObraModel.nombre)
+                     .order_by(GestionObraModel.nombre))
+            for nombre, total in query.tuples():
+                  print(f"{nombre}: {total}")
+         
+         elif opcion == 4:
+            print("\n--- Obras y monto total por tipo de obra ---")
+            query = (GestionObraModel
+                     .select(Tipo.tipo, fn.SUM(GestionObraModel.monto_contrato).alias('total'))
+                     .join(Tipo, on=(GestionObraModel.tipo == Tipo.id))
+                     .group_by(GestionObraModel.tipo))
+            for tipo, total in query.tuples():
+                  print(f"{tipo}: {total}")
+         
+         elif opcion == 5:
+            print("\n--- Barrios en las comunas 1, 2 y 3 ---")
+            comunas_ids = [1, 2, 3]
+            query = (GestionObraModel
+                     .select(Barrio.barrio)
+                     .join(Barrio, on=(GestionObraModel.barrio == Barrio.id))
+                     .where(GestionObraModel.comuna << comunas_ids))
+            for barrio in query.tuples():
+                  print(barrio)
+         
+         elif opcion == 6:
+            print("\n--- Obras finalizadas y monto en la comuna 1 ---")
+            query = (GestionObraModel
+                     .select(fn.COUNT(GestionObraModel.id).alias('cantidad'),
+                              fn.SUM(GestionObraModel.monto_contrato).alias('monto'))
+                     .where((GestionObraModel.comuna == 1) & (GestionObraModel.etapa == 1)))
+            for cantidad, monto in query.tuples():
+                  print(f"Obras: {cantidad}, Monto: {monto}")
+         
+         elif opcion == 7:
+            print("\n--- Obras finalizadas en ≤ 24 meses ---")
+            query = (GestionObraModel
+                     .select(fn.COUNT(GestionObraModel.id).alias('cantidad'))
+                     .where(GestionObraModel.plazo_meses <= 24))
+            print(f"Cantidad: {query.scalar()}")
+         
+         elif opcion == 8:
+            print("\n--- Porcentaje de obras finalizadas ---")
+            total = GestionObraModel.select(fn.COUNT(GestionObraModel.id)).scalar()
+            finalizadas = GestionObraModel.select(fn.COUNT(GestionObraModel.id)).where(GestionObraModel.etapa == 1).scalar()
+            porcentaje = round((finalizadas / total) * 100, 2) if total > 0 else 0
+            print(f"Porcentaje: {porcentaje}%")
+         
+         elif opcion == 9:
+            print("\n--- Total de mano de obra empleada ---")
+            total_mano_obra = (GestionObraModel
+                                 .select(fn.SUM(GestionObraModel.mano_obra))
+                                 .scalar())
+            print(f"Mano de obra total: {total_mano_obra}")
+         
+         elif opcion == 10:
+            print("\n--- Monto total de inversión ---")
+            total_inversion = (GestionObraModel
+                                 .select(fn.SUM(GestionObraModel.monto_contrato))
+                                 .scalar())
+            print(f"Monto total: {total_inversion}")
+         
+         elif opcion == 0:
+            print("Saliendo del programa. ¡Hasta luego!")
+         
+         else:
+            print("Opción inválida. Intente nuevamente.")
 
-     
-     
-     
+      while True:
+         mostrar_menu()
+         try:
+            opcion = int(input("Seleccione una opción: "))
+            if opcion == 0:
+                  ejecutar_opcion(opcion)
+                  break
+            ejecutar_opcion(opcion)
+         except ValueError:
+            print("Por favor, ingrese un número válido.")

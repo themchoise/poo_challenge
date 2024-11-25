@@ -1,8 +1,28 @@
+### 👥👥👥 Integrantes
 Walter Markerian
 Angelito Coscarelli
 Maximiliano Joyce
 Elisa Mele
 Santiago Vanotti
+
+->
+# Dependencias utilizadas
+
+pandas LTS
+peewee LTS
+numpy  LTS
+
+# Como ejecutar la APP
+1-> Clonar el repositorio
+2-> Definir el entorno virtual sobre el archivo requeriments.txt, para este proyecto se uso Python  3.11
+3-> dentro de la carpeta  markerian-coscarelli-mele-vanotti-joyce ejecutar el archivo main.py
+    el repositorio ya contiene el dataset ( fecha Noviembre 2024)
+    automaticamente creara la base de datos.
+
+Consideraciones:
+El proceso de ETL se inicia una vez, y luego el software solo permitira agregar obras con los datos populados
+si desea volver a popular los datos, en el caso de actualizar el dataset
+escoja la opcion de reiniciar ETL , lo que ocurrira es que la db se eliminara y el software se reiniciara ejecutando el ETL nuevamente
 
 ---
 
