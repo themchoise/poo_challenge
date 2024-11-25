@@ -118,16 +118,17 @@ def menu():
                 print("Obra rescindida con éxito.")
             else:
                 print("No hay una obra creada. Cree una obra primero.")
-        elif opcion == '11':
-            gestionObra.obtener_indicadores()             
-        elif opcion == '12':
-            
+        elif opcion == '10':
             print("Reiniciando ETL...")
             check_etl.reset_etl()
             python = sys.executable
             os.execl(python, python, *sys.argv)
             sys.re()
+                  
         elif opcion == '11':
+            
+            gestionObra.obtener_indicadores()       
+        elif opcion == '12':
             print("Saliendo del programa...")
             cerrar_conexion(conexion_db)
             sys.exit()
