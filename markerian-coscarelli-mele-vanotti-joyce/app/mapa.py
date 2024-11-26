@@ -1,6 +1,4 @@
 import folium
-from tkinter import *
-from tkhtmlview import HTMLLabel
 import re
 import webbrowser
 

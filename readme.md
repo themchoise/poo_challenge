@@ -8,15 +8,12 @@ Santiago Vanotti
 ->
 # Dependencias utilizadas
 
-pandas LTS
-peewee LTS
-numpy  LTS
+pandas     LTS
+peewee     LTS
+numpy      LTS
+folium     LTS
 
 # Como ejecutar la APP
-
-Si utiliza Linux Tkinter no viene por defecto con python, por lo tanto debe ejecutar:
-sudo apt update
-sudo apt install python3-tk
 
 1-> Clonar el repositorio
 2-> Definir el entorno virtual sobre el archivo requeriments.txt, para este proyecto se uso Python  3.11
@@ -28,6 +25,8 @@ Consideraciones:
 El proceso de ETL se inicia una vez, y luego el software solo permitira agregar obras con los datos populados
 si desea volver a popular los datos, en el caso de actualizar el dataset
 escoja la opcion de reiniciar ETL , lo que ocurrira es que la db se eliminara y el software se reiniciara ejecutando el ETL nuevamente
+
+La visualizacion del mapa se realizara a traves del browser por defecto
 
 ---
 
