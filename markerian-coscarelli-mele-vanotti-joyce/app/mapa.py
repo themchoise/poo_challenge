@@ -1,6 +1,7 @@
 import folium
 import re
 import webbrowser
+import os
 
 def normalizar_coordenadas(coord_arr):
     coordenadas_normalizadas = []
@@ -44,5 +45,12 @@ def mapa(coordenadas):
                       tooltip=coord["nombre"]).add_to(mapaObras)
 
     
-    mapaObras.save("markerian-coscarelli-mele-vanotti-joyce/data/mapaObras.html")
-    webbrowser.open("markerian-coscarelli-mele-vanotti-joyce/data/mapaObras.html")
+ 
+    ruta_relativa = "markerian-coscarelli-mele-vanotti-joyce/data/mapaObras.html"
+    ruta_absoluta = os.path.abspath(ruta_relativa)
+
+ 
+    mapaObras.save(ruta_absoluta)
+    webbrowser.open(ruta_absoluta)
+
+ 
