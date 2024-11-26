@@ -5,6 +5,7 @@ from app.gestionar_obra_imp import GestionarObraEspecifica
 from app.obra import Obra
 from app.db import crear_o_conectar_bd, cerrar_conexion
 from app.helpers import check_etl
+from app.mapa import mapa
 
 import logging
 
@@ -39,7 +40,7 @@ else:
     print("Proceso ETL Omitido")
   
 
-# Variable global para almacenar la obra creada
+
 obra_actual = None
 
 obra_actual = None
@@ -60,7 +61,8 @@ def menu():
         print("9. Rescindir obra")
         print("10. Reiniciar Proceso ETL")
         print("11. Menu de Indicadores")
-        print("12. Salir")
+        print("12. Mapa de Obras")
+        print("13. Salir")
         
         opcion = input("Seleccione una opción: ")
 
@@ -127,8 +129,10 @@ def menu():
                   
         elif opcion == '11':
             
-            gestionObra.obtener_indicadores()       
+            gestionObra.obtener_indicadores()   
         elif opcion == '12':
+            mapa(gestionObra.obtener_coordenadas() )    
+        elif opcion == '13':
             print("Saliendo del programa...")
             cerrar_conexion(conexion_db)
             sys.exit()
@@ -137,8 +141,8 @@ def menu():
 
 def crear_nueva_obra():
     print("\nCreando una nueva obra...")
-    nueva_obra_creada = gestionObra.nueva_obra()  # Simula la creación
-    print(f"Nueva obra creada: {nueva_obra_creada}")
+    nueva_obra_creada = gestionObra.nueva_obra()
+    print(f"Nueva obra creada")
     return nueva_obra_creada
 
 if __name__ == "__main__":

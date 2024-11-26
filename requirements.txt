@@ -1,3 +1,5 @@
 pandas
 peewee
 numpy
+folium
+tkhtmlview

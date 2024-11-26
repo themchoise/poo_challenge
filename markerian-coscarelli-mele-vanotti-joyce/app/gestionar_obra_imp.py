@@ -311,3 +311,15 @@ class GestionarObraEspecifica(GestionarObra):
             ejecutar_opcion(opcion)
          except ValueError:
             print("Por favor, ingrese un número válido.")
+   def obtener_coordenadas(self):
+       return GestionObraModel.select(
+                  GestionObraModel.lat,
+                  GestionObraModel.lng,
+                  GestionObraModel.nombre,
+                  GestionObraModel.descripcion
+               ).where(
+                  (GestionObraModel.lat.is_null(False)) & 
+                  (GestionObraModel.lng.is_null(False)) &
+                  (GestionObraModel.lat != "") & 
+                  (GestionObraModel.lng != "")
+               ).distinct().order_by(GestionObraModel.id.asc())

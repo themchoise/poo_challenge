@@ -13,6 +13,11 @@ peewee LTS
 numpy  LTS
 
 # Como ejecutar la APP
+
+Si utiliza Linux Tkinter no viene por defecto con python, por lo tanto debe ejecutar:
+sudo apt update
+sudo apt install python3-tk
+
 1-> Clonar el repositorio
 2-> Definir el entorno virtual sobre el archivo requeriments.txt, para este proyecto se uso Python  3.11
 3-> dentro de la carpeta  markerian-coscarelli-mele-vanotti-joyce ejecutar el archivo main.py

@@ -34,6 +34,10 @@ class GestionarObra(ABC):
     def obtener_indicadores(self):
         pass
 
+    @abstractmethod
+    def obtener_coordenadas(self):
+        pass
+
     @classmethod
     def nueva_obra(self):
         return Obra()
